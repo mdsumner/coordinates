@@ -18,7 +18,21 @@ knitr::opts_chunk$set(
 
 The goal of coordinates is to provide a simple basis for storing coordinates. At its simplest this is two vectors of x and y data but should always include a *coordinate reference system* (i.e. a map projection) to enable transformations. 
 
-In R there are many formal and informal methods for storing coordinates. The informal ones are efficient and fast. There's no efficient way to store raw coordinates in a data frame with reference system metadata: the closest was sp's `SpatialPointsDataFrame` but that only worked by pretending to be a data frame. The tidyverse still has no coordinates data frame mechanism. 
+
+## Installation
+
+You can install the development version of coordinates from [Github](https://github.com/mdsumner/coordinates) with:
+
+``` r
+remotes::install_github("mdsumner/coordinates")
+```
+
+## Motivation
+
+In R there are many formal and informal methods for storing coordinates. The informal ones tend to be efficient and fast. There's no efficient way to store raw coordinates in a data frame with reference system metadata: the closest was sp's `SpatialPointsDataFrame` but that only worked by pretending to be a data frame. The tidyverse still has no coordinates data frame mechanism. 
+
+
+There are so many uses for spatial data in various contexts but the formal data structures that provide containers are limited to *regular rasters* and *simple features* both of which ignore many common spatial data structures and forms. A set of spatial data in a table is such a simple and basic need, and coordinates aims to fill some of the gap. 
 
 
 ```{r}
@@ -51,14 +65,6 @@ system.time(print(ggplot(data2, aes(x, y)) + geom_point(pch = ".")))
 #system.time(print(ggplot(data3) + geom_sf(pch = ".")))  ## Timing stopped at: 192.5 2.206 194.7
 
 
-```
-
-## Installation
-
-You can install the development version of coordinates from [Github](https://github.com/mdsumner/coordinates) with:
-
-``` r
-remotes::install_github("mdsumner/coordinates")
 ```
 
 ## Example
@@ -100,16 +106,24 @@ Technically it's not possible to round-trip from any projection to another, we h
 
 ## Development
 
-There's more to do!  
+There's more to do!   The package [reproj](https://github.com/hypertidy/reproj/) and coordinates will develop together as they are closely related. 
 
+* currently we include sp and raster example methods, but they need to go
 * reproj needs a modern interface to PROJ
 * the vctrs mechanism is only partially implemented here
 * PROJ strings are only partially practical ("+init=epsg:code" form is not
  supported on CRAN for instance)
 * warn on data loss (e.g. UTM, or merc out of bounds, ...)
 * flesh out use of coordinates by other packages, e.g. silicate
+* consider 3-space coordinates (complicated by lack of formal clarity regarding implicit z = 0, angular coordinates in radians, geocentric systems, planar systems and how we tend to mix units)
 
 
 
+## Getting help
+
+If you encounter a clear bug, please file a minimal reproducible example on [github](https://github.com/mdsumner/coordinates/issues). For questions and other discussion, please use [community.rstudio.com](https://community.rstudio.com/), or twitter. 
+
+
+---
 
 Please note that the 'coordinates' project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project, you agree to abide by its terms.

@@ -8,12 +8,29 @@ coordinates. At its simplest this is two vectors of x and y data but
 should always include a *coordinate reference system* (i.e. a map
 projection) to enable transformations.
 
+## Installation
+
+You can install the development version of coordinates from
+[Github](https://github.com/mdsumner/coordinates) with:
+
+``` r
+remotes::install_github("mdsumner/coordinates")
+```
+
+## Motivation
+
 In R there are many formal and informal methods for storing coordinates.
-The informal ones are efficient and fast. There’s no efficient way to
-store raw coordinates in a data frame with reference system metadata:
-the closest was sp’s `SpatialPointsDataFrame` but that only worked by
-pretending to be a data frame. The tidyverse still has no coordinates
-data frame mechanism.
+The informal ones tend to be efficient and fast. There’s no efficient
+way to store raw coordinates in a data frame with reference system
+metadata: the closest was sp’s `SpatialPointsDataFrame` but that only
+worked by pretending to be a data frame. The tidyverse still has no
+coordinates data frame mechanism.
+
+There are so many uses for spatial data in various contexts but the
+formal data structures that provide containers are limited to *regular
+rasters* and *simple features* both of which ignore many common spatial
+data structures and forms. A set of spatial data in a table is such a
+simple and basic need, and coordinates aims to fill some of the gap.
 
 ``` r
 n <- 1e6
@@ -24,7 +41,7 @@ system.time(plot(data, pch = "."))
 <img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.142   0.043   1.185
+    #>   1.154   0.068   1.221
     
     data1 <- cbind(x = data$x, y = data$y)
     system.time(plot(data1, pch = "."))
@@ -32,12 +49,12 @@ system.time(plot(data, pch = "."))
 <img src="man/figures/README-unnamed-chunk-1-2.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.282   0.047   1.330
+    #>   1.261   0.056   1.317
     
     data2 <- as.data.frame(data1)
     system.time(plot(data2, pch = "."))
     #>    user  system elapsed 
-    #>   1.258   0.045   1.304
+    #>   1.235   0.052   1.287
     
     data2.1 <- data2
     data2.1$a <- seq_len(nrow(data2.1))
@@ -59,7 +76,7 @@ system.time(plot(st_geometry(data3), pch = ".", asp = ""))
 <img src="man/figures/README-unnamed-chunk-1-4.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   8.102   0.284   8.390
+    #>   8.557   0.464   9.021
     
     
     library(ggplot2)
@@ -68,19 +85,10 @@ system.time(plot(st_geometry(data3), pch = ".", asp = ""))
 <img src="man/figures/README-unnamed-chunk-1-5.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   6.478   0.100   6.581
+    #>   6.564   0.178   6.744
     
     ## this is so slow, it's pointless to use geom_sf at all for such simple data
     #system.time(print(ggplot(data3) + geom_sf(pch = ".")))  ## Timing stopped at: 192.5 2.206 194.7
-
-## Installation
-
-You can install the development version of coordinates from
-[Github](https://github.com/mdsumner/coordinates) with:
-
-``` r
-remotes::install_github("mdsumner/coordinates")
-```
 
 ## Example
 
@@ -99,7 +107,7 @@ system.time(plot(x, pch = "."))
 <img src="man/figures/README-example-1.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.177   0.000   1.178
+    #>   1.206   0.000   1.207
 
 By using the advanced techniques of vctrs we have defined behaviour to
 bind x and y together in a single column, along with persistent metadata
@@ -114,21 +122,21 @@ system.time(plot(x1 <- reproj(x, "+proj=laea +datum=WGS84"), pch = "."))
 <img src="man/figures/README-proj-1.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.535   0.000   1.536
+    #>     1.6     0.0     1.6
     
     system.time(plot(x2 <- reproj(x1, "+proj=ortho +datum=WGS84"), pch = "."))
 
 <img src="man/figures/README-proj-2.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.416   0.000   1.416
+    #>   1.469   0.000   1.469
     
     system.time(plot(x3 <- reproj(x2, "+proj=merc +datum=WGS84"), pch = "."))
 
 <img src="man/figures/README-proj-3.png" width="100%" />
 
     #>    user  system elapsed 
-    #>    1.05    0.00    1.05
+    #>   1.037   0.000   1.038
     
     vicgrid <- "+proj=lcc +lat_1=-36 +lat_2=-38 +lat_0=-37 +lon_0=145 +x_0=2500000 +y_0=2500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
     
@@ -140,7 +148,7 @@ system.time(plot(x1 <- reproj(x, "+proj=laea +datum=WGS84"), pch = "."))
 <img src="man/figures/README-proj-4.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.309   0.000   1.311
+    #>   1.304   0.000   1.305
     
     
     system.time(plot(x5 <- reproj(x4, "+proj=longlat +datum=WGS84"), pch = "."))
@@ -148,7 +156,7 @@ system.time(plot(x1 <- reproj(x, "+proj=laea +datum=WGS84"), pch = "."))
 <img src="man/figures/README-proj-5.png" width="100%" />
 
     #>    user  system elapsed 
-    #>   1.392   0.000   1.392
+    #>   1.396   0.000   1.397
 
 Technically it’s not possible to round-trip from any projection to
 another, we have carefully chosen a round-trippable set of coordinate
@@ -156,14 +164,30 @@ systems here.
 
 ## Development
 
-There’s more to do\!
+There’s more to do\! The package
+[reproj](https://github.com/hypertidy/reproj/) and coordinates will
+develop together as they are closely related.
 
+  - currently we include sp and raster example methods, but they need to
+    go
   - reproj needs a modern interface to PROJ
   - the vctrs mechanism is only partially implemented here
   - PROJ strings are only partially practical (“+init=epsg:code” form is
     not supported on CRAN for instance)
   - warn on data loss (e.g. UTM, or merc out of bounds, …)
   - flesh out use of coordinates by other packages, e.g. silicate
+  - consider 3-space coordinates (complicated by lack of formal clarity
+    regarding implicit z = 0, angular coordinates in radians, geocentric
+    systems, planar systems and how we tend to mix units)
+
+## Getting help
+
+If you encounter a clear bug, please file a minimal reproducible example
+on [github](https://github.com/mdsumner/coordinates/issues). For
+questions and other discussion, please use
+[community.rstudio.com](https://community.rstudio.com/), or twitter.
+
+-----
 
 Please note that the ‘coordinates’ project is released with a
 [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By contributing to

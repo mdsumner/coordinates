@@ -1,5 +1,5 @@
 Package: coordinates
-Title: A simple class to store coordinates. 
+Title: A simple class to store coordinates
 Version: 0.0.0.9000
 Authors@R: c(person("Michael D.","Sumner", role = c("aut", "cre"), 
  email = "mdsumner@gmail.com"))
