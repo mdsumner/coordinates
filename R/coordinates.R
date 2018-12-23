@@ -49,6 +49,21 @@ coordinates.Spatial <- function(x = double(), y = double(), crs = character()) {
  xy <- sp::coordinates(x)
  coordinates(x = xy[,1], y = xy[,2], crs = x@proj4string@projargs)
 }
+#' @name coordinates
+#' @export
+coordinates.BasicRaster <- function(x = double(), y = double(), crs = character()) {
+  xy <- sp::coordinates(x)
+  coordinates(x = xy[,1], y = xy[,2], crs = x@crs@projargs)
+
+}
+#' @name coordinates
+#' @export
+coordinates.matrix <- function(x = double(), y = double(), crs = character()) {
+  coordinates(x = x[,1], y = x[,2], crs = crs)
+
+}
+
+
 #coordinates.sf <- function(x = double(), y = double(), crs = character()) {
   ##  we can get really evil
 #  xy <- silicate::sc_coord(x)
@@ -95,6 +110,11 @@ crs <- function(x) attr(x, "crs")
 #' @importFrom reproj reproj
 #' @export reproj
 #' @export
+#' @examples
+#' library(raster)
+#' r <- raster()
+#' crds <- coordinates(r)
+#' plot(reproj(crds, target = "+proj=laea +datum=WGS84"), pch = ".", asp = 1)
 reproj.vctrs_coordinates <- function(x, target, ..., source = NULL) {
   out <- reproj(cbind(vctrs::field(x, "x"), vctrs::field(x, "y")), target = target, source = crs(x))
   coordinates(out[,1], out[, 2], crs = target)

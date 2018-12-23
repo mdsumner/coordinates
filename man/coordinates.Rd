@@ -5,6 +5,8 @@
 \alias{new_coordinates}
 \alias{coordinates.default}
 \alias{coordinates.Spatial}
+\alias{coordinates.BasicRaster}
+\alias{coordinates.matrix}
 \title{A coordinates tuple with vctrs}
 \usage{
 new_coordinates(x = double(), y = double(), crs = character())
@@ -15,6 +17,12 @@ coordinates(x = double(), y = double(), crs = character())
   crs = character())
 
 \method{coordinates}{Spatial}(x = double(), y = double(),
+  crs = character())
+
+\method{coordinates}{BasicRaster}(x = double(), y = double(),
+  crs = character())
+
+\method{coordinates}{matrix}(x = double(), y = double(),
   crs = character())
 }
 \arguments{
