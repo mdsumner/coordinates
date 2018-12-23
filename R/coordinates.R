@@ -1,18 +1,24 @@
-#' Title
+#' A coordinates tuple with vctrs
 #'
-#' @param x
-#' @param y
+#' @param x x stuff
+#' @param y y stuff
+#' @param proj stuff
 #'
-#' @return
+#' @return vctrs_coordinates
 #' @export
 #' @importFrom vctrs field new_vctr vec_assert vec_cast
 #' @examples
 #'
 #' new_coordinates()
 #' coordinates()
-#' x <- new_coordinates(rnorm(10))
+#' ## note how this must be explicitly double (not integer) but the
+#' ## easy to use constructor handles the coercion
+#' x <- new_coordinates(rnorm(10), as.double(1:10))
+#' x <- coordinates(rnorm(10), 1:10)
 #' x
 #' as.data.frame(x)
+#' plot(x)
+#' @name coordinates
 new_coordinates <- function(x = double(),
                             y = double(),
                             crs= character()) {
@@ -43,6 +49,11 @@ coordinates.Spatial <- function(x = double(), y = double(), crs = character()) {
  xy <- sp::coordinates(x)
  coordinates(x = xy[,1], y = xy[,2], crs = x@proj4string@projargs)
 }
+#coordinates.sf <- function(x = double(), y = double(), crs = character()) {
+  ##  we can get really evil
+#  xy <- silicate::sc_coord(x)
+#  coordinates(x = xy[,1], y = xy[,2], crs = silicate:::get_projection(x))
+#}
 #' @export
 format.vctrs_coordinates <- function(x, ...) {
   outx <- formatC(signif(vctrs::field(x, "x"), 3))
@@ -77,4 +88,14 @@ vec_ptype_full.vctrs_coordinates <- function(x) "coordinates"
 #' @export
 plot.vctrs_coordinates <- function(x, ...) {
   plot(field(x, "x"), field(x, "y"), ...)
+}
+
+crs <- function(x) attr(x, "crs")
+
+#' @importFrom reproj reproj
+#' @export reproj
+#' @export
+reproj.vctrs_coordinates <- function(x, target, ..., source = NULL) {
+  out <- reproj(cbind(vctrs::field(x, "x"), vctrs::field(x, "y")), target = target, source = crs(x))
+  coordinates(out[,1], out[, 2], crs = target)
 }
